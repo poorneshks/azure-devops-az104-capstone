@@ -1,0 +1,33 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: Build
+  jobs:
+  - job: TerraformValidation
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.x'
+    - script: |
+        echo "Installing Terraform"
+        sudo apt-get update -y
+        sudo apt-get install -y terraform
+        cd terraform
+        terraform init -backend=false
+        terraform validate
+      displayName: 'Validate Terraform code'
+
+  - job: AppValidation
+    steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.x'
+    - script: |
+        cd app
+        pip install -r requirements.txt
+        python -m py_compile app.py
+      displayName: 'Validate Python app'
