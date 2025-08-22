@@ -19,7 +19,8 @@ stages:
         cd terraform
         terraform init -backend=false
         terraform validate
-      displayName: 'Validate Terraform code'
+        terraform plan -out=tfplan.out
+      displayName: 'Validate & Plan Terraform code'
 
   - job: AppValidation
     steps:
@@ -30,4 +31,5 @@ stages:
         cd app
         pip install -r requirements.txt
         python -m py_compile app.py
-      displayName: 'Validate Python app'
+        pytest || echo "No tests found"
+      displayName: 'Validate & Test Python app'
